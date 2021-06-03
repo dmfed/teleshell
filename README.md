@@ -32,7 +32,7 @@ To install:
 
 1. Clone the repository: 
 
-**git clone https://github.com/dmfed/teleshell** 
+**git clone --depth=1 https://github.com/dmfed/teleshell** 
 
 2. Build the binary: 
 
