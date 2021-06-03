@@ -11,9 +11,12 @@
 #
 # Note that teleshell issues 'stty -echo' command immediately after starting
 # shell. If you'd like to have echo on add 'stty echo' below.
+cd $HOME
 export PS1="[teleshell]:\u@\h:\w > "
 unset PAGER 
 alias systemctl='systemctl --no-pager'
+alias apt-get='apt-get -q'
+# alias apt-get='apt-get -q -y'
 unalias ls
 unalias grep
 

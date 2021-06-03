@@ -4,7 +4,7 @@ Wants=network-online.service
 After=network-online.service NetworkManager-wait-online.service
 
 [Service]
-User=<your username here>
+User=<your unix username here>
 Type=exec
 ExecStart=/usr/local/bin/teleshell
 
