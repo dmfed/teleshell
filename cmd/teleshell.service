@@ -1,0 +1,12 @@
+[Unit]
+Description=TeleShell Daemon
+Wants=network-online.service
+After=network-online.service NetworkManager-wait-online.service
+
+[Service]
+User=<your username here>
+Type=exec
+ExecStart=/usr/local/bin/teleshell
+
+[Install]
+WantedBy=multi-user.target
