@@ -78,20 +78,6 @@ func New(token, username, onstartscript string) (*TeleShell, error) {
 	ts.bot = bot
 	// single handler since we only want to talk to authorized user
 	ts.bot.Handle(telebot.OnText, ts.authAndRoute)
-	/*
-		go func() {
-			n := 0
-			for {
-				if k := runtime.NumGoroutine(); k != n {
-					if k > 15 {
-						log.Println("warning: teleshell goroutines number is:", n)
-					}
-					n = k
-				}
-				time.Sleep(time.Second * 1)
-			}
-		}()
-	*/
 	return &ts, nil
 }
 
@@ -176,7 +162,7 @@ func (ts *TeleShell) startSession(m *telebot.Message) {
 			}
 		}
 		ts.send(m.Chat, msgSessionStopped)
-		log.Println("teleshell: shell listening goroutine finishing")
+		// log.Println("teleshell: shell listening goroutine finishing")
 	}()
 }
 
