@@ -18,8 +18,6 @@ It can also execute single command by directly starting a new process **without*
 2. No need for public IP address.
 3. A shell in a Telegram chat right in my phone? Cool! :)
 
-# WARNING!!! If you choose to try this on you machine - do that at your own risk. You've now been warned :)
-
 ## How to try/install
 Currently TeleShell does not have any install scripts etc. (and I doubt it ever will). 
 Prerequisites:
