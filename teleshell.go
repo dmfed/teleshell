@@ -52,11 +52,10 @@ Use the following commands:
 /%v to see this message again.`, commSingleCommand, commStartSession, commStopSession, commHelp)
 
 type TeleShell struct {
-	TelegramUsername    string
-	OnStart             string
-	shellChatInProgress bool
-	shell               *shell.Shell
-	bot                 *telebot.Bot
+	TelegramUsername string
+	OnStart          string
+	shell            *shell.Shell
+	bot              *telebot.Bot
 }
 
 // New returns instance of TeleShell with default settings.
@@ -119,7 +118,7 @@ func (ts *TeleShell) authAndRoute(m *telebot.Message) {
 		ts.stopSession(m)
 	case command == commHelp:
 		ts.help(m)
-	case ts.shellChatInProgress:
+	case ts.shell != nil:
 		ts.handleSessionMsg(m)
 	default:
 		ts.help(m)
@@ -140,7 +139,7 @@ func (ts *TeleShell) execSingleCommand(m *telebot.Message) {
 }
 
 func (ts *TeleShell) startSession(m *telebot.Message) {
-	if ts.shellChatInProgress {
+	if ts.shell != nil {
 		ts.send(m.Chat, msgSessionInProgress)
 		return
 	}
@@ -150,13 +149,12 @@ func (ts *TeleShell) startSession(m *telebot.Message) {
 		return
 	}
 	ts.shell = shell
-	ts.shellChatInProgress = true
 	ts.send(m.Chat, msgSessionStarted)
 	go func() {
-		for ts.shellChatInProgress { // TODO: data race here
+		for ts.shell != nil {
 			select {
 			case <-shell.Stopped():
-				ts.shellChatInProgress = false
+				ts.shell = nil
 			case output := <-shell.Output():
 				ts.send(m.Chat, output)
 			}
@@ -167,14 +165,11 @@ func (ts *TeleShell) startSession(m *telebot.Message) {
 }
 
 func (ts *TeleShell) stopSession(m *telebot.Message) {
-	if !ts.shellChatInProgress {
+	if ts.shell == nil {
 		ts.send(m.Chat, msgSessionNotInProgress)
 		return
 	}
-	ts.shellChatInProgress = false // this will prevent wait on select
-	ts.shell.Stop()                // this will trigger release from select
-	time.Sleep(time.Second)
-	ts.shell = nil
+	ts.shell.Stop() // this will trigger release from select is startSession
 }
 
 func (ts *TeleShell) handleSessionMsg(m *telebot.Message) {

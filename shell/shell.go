@@ -23,6 +23,8 @@ type Shell struct {
 // New returns instance of Shell. If New
 // returned no error the shell is fully functional
 // (readable and writable when New returns.
+// onstartscript is the name of the file sourced
+// when shell starts.
 func New(onstartscript string) (*Shell, error) {
 	f, err := startShell()
 	if err != nil {
@@ -45,20 +47,15 @@ func New(onstartscript string) (*Shell, error) {
 		}
 		buf := make([]byte, 16384)
 		for {
-			// log.Println("shell: reader goroutine blocking on read")
 			// This call to Read() unblocks when shell quits on 'exit' command
-			// otherwise the goroutine gets stuck forever and can not be terminated
-			// even by calling sh.file.Close().
+			// otherwise this goroutine gets stuck and garbage collected.
 			n, err := sh.file.Read(buf)
-			// log.Println("read unblocked")
 			if err != nil {
 				// log.Println("shell: reader goroutine stopping on error:", err)
 				break
 			}
 			sh.output <- string(buf[:n])
-			time.Sleep(time.Second)
 		}
-		sh.stopped <- true
 		close(sh.output)
 		close(sh.stopped)
 		// log.Println("shell: reader goroutine finished")
@@ -73,11 +70,11 @@ func startShell() (*os.File, error) {
 	// trying to convince everyone we need compatibility mode
 	os.Setenv("TERM", "vt220")
 	cmd := exec.Command("bash")
-	ptmx, err := pty.Start(cmd)
+	pts, err := pty.Start(cmd)
 	if err != nil {
 		return nil, err
 	}
-	return ptmx, nil
+	return pts, nil
 }
 
 // Output returns a channel to which the slave pty writes
@@ -86,8 +83,9 @@ func (sh *Shell) Output() chan string {
 }
 
 // Stopped returns a channel indicating that underlying shell died.
-// If read from this channel succeeds the shell quitted on 'exit' command
-// or due to an io error.
+// If read from this channel succeeds  no more output will be sent
+// to channel accesible with Output() method.
+// Either the shell quitted on 'exit' command, due to an io error.
 func (sh *Shell) Stopped() chan bool {
 	return sh.stopped
 }
@@ -134,10 +132,6 @@ func (sh *Shell) writeCommand(payload []byte) error {
 // does not unblock Read. TODO.
 func (sh *Shell) Stop() {
 	// TODO: better way to quit
-	/*
-		if err := syscall.Close(int(sh.file.Fd())); err != nil {
-			log.Println("syscall.Close() returned:", err)
-		}*/
 	if err := sh.file.Close(); err != nil {
 		log.Println("shell: file.Close() returned:", err)
 	}
