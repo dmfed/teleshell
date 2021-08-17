@@ -74,7 +74,7 @@ Go to your Telegram app of choice and talk to [**@BotFather**](https://t.me/BotF
 
 ## Using the bot
 
-From this point on you're good to go. Just lauch teleshell with **teleshell** if you copied executable binary to **/usr/local/bin** as suggested in Try/Istall section above above, then go to Telegram app and start a chat with your bot. The bot should show available command on start. Issue */help* command any time to see what the bot can do.
+From this point on you're good to go. Just lauch teleshell with **teleshell** if you copied executable binary to **/usr/local/bin** as suggested in Try/Install section above above, then go to Telegram app and start a chat with your bot. The bot should show available command on start. Issue */help* command any time to see what the bot can do.
 
 ## Caveats
 
@@ -93,6 +93,7 @@ Put **teleshell.service** into **/etc/systemd/system** (or elsewhere where syste
 Then:
 
 **sudo systemctl daemon-reload**
+
 **sudo systemctl reenable teleshell**
 
 ## Credits
