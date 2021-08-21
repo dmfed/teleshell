@@ -57,7 +57,9 @@ func main() {
 	shell, err := teleshell.New(token, username, scriptFile)
 	if err != nil {
 		log.Println("teleshell: error starting bot:", err)
+		os.Exit(2)
 	} else {
 		shell.Start()
+		os.Exit(0)
 	}
 }
