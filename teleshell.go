@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/dmfed/teleshell/shell"
-	"gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/telebot.v3"
 )
 
 // 4096 is Telegram's max message size.
@@ -100,10 +100,11 @@ func (ts *TeleShell) Stop() {
 	ts.bot.Stop()
 }
 
-func (ts *TeleShell) authAndRoute(m *telebot.Message) {
+func (ts *TeleShell) authAndRoute(c telebot.Context) error {
+	m := c.Message()
 	if !ts.isAuthorized(m.Sender) {
 		ts.sorry(m)
-		return
+		return nil
 	}
 	command := ""
 	if botCommandRegexp.MatchString(m.Text) {
@@ -123,6 +124,7 @@ func (ts *TeleShell) authAndRoute(m *telebot.Message) {
 	default:
 		ts.help(m)
 	}
+	return nil
 }
 
 func (ts *TeleShell) isAuthorized(u *telebot.User) bool {
